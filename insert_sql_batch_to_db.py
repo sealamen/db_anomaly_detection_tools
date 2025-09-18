@@ -3,7 +3,7 @@ import math
 
 '''
 sql insert 파일을 실행하여 DB 에 저장하는 도구 
-- csv_to_sql 파일로 생성된 1000건 단위의 insertALL 쿼리 실행만 가능 
+- csv_to_sql_batch 파일로 생성된 1000건 단위의 insertALL 쿼리 실행만 가능 
 - 일반 sql 파일 insert 는 손봐야됨 
 
 실행 방법 
