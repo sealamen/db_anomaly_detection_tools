@@ -5,6 +5,7 @@ import os
 def generate_synthetic_metrics(start_time, end_time, freq_sec=10, mode="normal",
                                save_file_name=None, include_is_anomaly=False):
     """
+    TODO : 정규분포를 따르는 데이터셋 만들기 (이상치 데이터는 학습 전, 데이터 import 할 때 전처리)
     DB 성능 지표 샘플 데이터 생성기
     mode: "normal" -> 정상 패턴 / "anomaly" -> 이상치 포함
     include_is_anomaly: True면 is_anomaly 컬럼도 CSV에 포함 저장
@@ -50,10 +51,8 @@ def generate_synthetic_metrics(start_time, end_time, freq_sec=10, mode="normal",
         'buffer_cache_hit_ratio': np.random.uniform(85, 99, N),
         'shared_pool_free_pct': np.random.uniform(15, 50, N),
         'library_cache_hit_ratio': np.random.uniform(85, 99, N),
-        'sga_free_mb': np.random.uniform(200, 1000, N),
-        'pga_used_mb': np.random.uniform(50, 500, N),
-        'active_sessions': active_sessions,
         'sessions_total': np.random.randint(50, 300, N),
+        'active_sessions': active_sessions,
         'logons_per_sec': np.random.uniform(0, 2, N),
         'process_count': np.random.randint(50, 400, N),
         'physical_reads_per_sec': np.random.uniform(10, 300, N),
@@ -73,7 +72,9 @@ def generate_synthetic_metrics(start_time, end_time, freq_sec=10, mode="normal",
         'user_calls_per_sec': np.random.uniform(0, 100, N),
         'executions_per_sec': np.random.uniform(0, 200, N),
         'parse_count_per_sec': np.random.uniform(0, 50, N),
-        'hard_parse_ratio_pct': np.random.uniform(0, 20, N)
+        'hard_parse_ratio_pct': np.random.uniform(0, 20, N),
+        'sga_free_mb': np.random.uniform(200, 1000, N),
+        'pga_used_mb': np.random.uniform(50, 500, N)
     })
 
     # =============================
@@ -108,9 +109,15 @@ def generate_synthetic_metrics(start_time, end_time, freq_sec=10, mode="normal",
 
 
 # 데이터 생성 (정상 데이터)
-# generate_synthetic_metrics(start_time="2025-09-01", end_time=pd.Timestamp.now(), mode="normal",
-#                            save_file_name="./datasets/csv/normal.csv", include_is_anomaly=False)
+generate_synthetic_metrics(start_time="2025-09-16",
+                           end_time=pd.Timestamp.now(),
+                           mode="normal",  # normal / anomaly
+                           save_file_name="./datasets/csv/normal_split.csv",
+                           include_is_anomaly=False)  # True / False
 
 # 데이터 생성 (이상 데이터 포함) : 위에꺼 수정하면 되는데 그냥 하나 더 해놓음
-generate_synthetic_metrics(start_time="2025-09-20", end_time="2025-09-22", mode="anomaly",
-                           save_file_name="./datasets/csv/anomaly.csv", include_is_anomaly=False)
+# generate_synthetic_metrics(start_time="2025-09-20",
+#                            end_time="2025-09-22",
+#                            mode="anomaly",
+#                            save_file_name="./datasets/csv/anomaly.csv",
+#                            include_is_anomaly=False)
