@@ -1,5 +1,5 @@
 import oracledb
-import math
+import time
 
 '''
 sql insert 파일을 실행하여 DB 에 저장하는 도구 
@@ -28,7 +28,7 @@ dsn = 'localhost:1521/XE'
 # =============================
 # 3️⃣ SQL 파일 경로
 # =============================
-sql_file = './datasets/sql/insert_db_metrics_batch_2025_09_17_test.sql'
+sql_file = './datasets/sql/normal_split.sql'
 
 # =============================
 # 4️⃣ SQL 파일 읽기
@@ -55,16 +55,28 @@ cursor = conn.cursor()
 batch_count = 0
 inserted_rows = 0
 
+overall_start = time.time()  # 전체 시작 시간
+COMMIT_INTERVAL_ROWS = 10000   # 1만 건마다 커밋 (즉, batch 10개마다)
+
 for command in sql_commands:
+    batch_start = time.time()  # 배치 시작 시간
     try:
         cursor.execute(command)
         batch_count += 1
         inserted_rows += ROWS_PER_BATCH
 
         # 한 command 단위로 커밋
-        conn.commit()
+        # conn.commit()
+
+        # 1만 건 단위로 커밋
+        if inserted_rows % COMMIT_INTERVAL_ROWS == 0:
+            conn.commit()
+            print(f"💾 {inserted_rows} rows 커밋 완료")
+
         percent = round(inserted_rows / TOTAL_ROWS * 100, 2)
-        print(f"✅ {inserted_rows}/{TOTAL_ROWS} rows inserted ({percent}% complete)")
+        batch_time = time.time() - batch_start
+
+        print(f"✅ {inserted_rows}/{TOTAL_ROWS} rows inserted ({percent}% complete) | 소요 시간 {batch_time:.2f} 초: ")
 
     except Exception as e:
         print(f"❌ 에러 발생: {e}")
@@ -78,4 +90,7 @@ for command in sql_commands:
 conn.commit()
 cursor.close()
 conn.close()
+
+overall_time = time.time() - overall_start
 print("✅ 모든 SQL 실행 완료! 데이터 삽입 완료")
+print(f"⏱ 총 소요 시간: {overall_time:.2f} 초")
